@@ -55,9 +55,6 @@ jobs:
         # Note: 'Complete job' is not a standard GitHub Action.
         # The job automatically completes when the last step finishes.
         # You can remove this step if you want to keep the workflow clean.
-=======
+
 // Open file for review
 
-=======
-// Open file for review
->>>>>>> Stashed changes
