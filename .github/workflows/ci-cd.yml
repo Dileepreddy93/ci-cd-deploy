@@ -1,3 +1,5 @@
+<<<<<<< Updated upstream
+
 name: CI/CD Pipeline # Keep this if it's at the top of your file
 
 on:
@@ -55,3 +57,9 @@ jobs:
         # Note: 'Complete job' is not a standard GitHub Action.
         # The job automatically completes when the last step finishes.
         # You can remove this step if you want to keep the workflow clean.
+=======
+// Open file for review
+
+=======
+// Open file for review
+>>>>>>> Stashed changes
