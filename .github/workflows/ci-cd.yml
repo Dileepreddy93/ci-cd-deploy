@@ -1,32 +1,38 @@
-name: CI/CD Pipeline
+name: CI/CD Pipeline # The name of your workflow
 
 on:
   push:
-    branches: [ main ]
+    branches:
+      - main # Triggers on pushes to the 'main' branch
   pull_request:
-    branches: [ main ]
+    branches:
+      - main # Triggers on pull requests to the 'main' branch
 
 jobs:
-  build:
-    runs-on: ubuntu-latest
+  build: # This is your 'build' job
+    runs-on: ubuntu-latest # The operating system for the job
 
-    steps:
-    - name: ⬇️ Checkout code
-      uses: actions/checkout@v3
+    steps: # <--- THIS IS WHERE YOU PASTE THE CODE!
+      # Existing steps before 'Checkout code' (if any) go here
 
-    - name: 🟢 Set up Node.js
-      uses: actions/setup-node@v3
-      with:
-        node-version: '18'
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-    - name: 📦 Install dependencies
-      run: npm install
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
 
-    - name: 🧪 Run tests
-      run: npm test
+      - name: Debug directory contents (optional - remove after fixing)
+        run: ls -F
 
-    - name: 🏗️ Build project
-      run: npm run build
+      - name: Install dependencies
+        run: npm install
+        # working-directory: ./frontend # Uncomment and modify if your package.json is in a subfolder
 
-    - name: 🚀 Deploy (Optional - comment this if not needed)
-      run: echo "Add your deployment steps here, like rsync, scp, vercel --prod etc."
+      # The rest of your build steps (like 'Run tests', 'Build project', etc.)
+      # will go after the 'Install dependencies' step.
+      # You can just keep your existing steps that follow 'Install dependencies'.
+
+  # Other jobs (like 'deploy') would go here, if you have them
+
