@@ -1,5 +1,5 @@
-<<<<<<< Updated upstream
 name: CI/CD Pipeline # Keep this if it's at the top of your file
+
 on:
   push:
     branches:
