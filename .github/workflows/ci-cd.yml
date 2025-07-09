@@ -1,38 +1,54 @@
-name: CI/CD Pipeline # The name of your workflow
+name: CI/CD Pipeline
 
 on:
   push:
     branches:
-      - main # Triggers on pushes to the 'main' branch
+      - main
   pull_request:
     branches:
-      - main # Triggers on pull requests to the 'main' branch
+      - main
 
 jobs:
-  build: # This is your 'build' job
-    runs-on: ubuntu-latest # The operating system for the job
+  build:
+    runs-on: ubuntu-latest
 
-    steps: # <--- THIS IS WHERE YOU PASTE THE CODE!
-      # Existing steps before 'Checkout code' (if any) go here
-
+    steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Set up Node.js
-        uses: actions/setup-node@v4
+      # --- START OF NEW/MODIFIED PYTHON STEPS ---
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
         with:
-          node-version: '20'
+          python-version: '3.9' # Or '3.x' for the latest available 3.x, or a specific version like '3.10', '3.11' etc.
+                                # Check what Python version your 'app.py' requires.
 
-      - name: Debug directory contents (optional - remove after fixing)
-        run: ls -F
+      - name: Install Python dependencies
+        run: pip install -r requirements.txt
+        # If your requirements.txt is in a subfolder (e.g., './backend'), use:
+        # working-directory: ./backend
 
-      - name: Install dependencies
-        run: npm install
-        # working-directory: ./frontend # Uncomment and modify if your package.json is in a subfolder
+      # --- END OF NEW/MODIFIED PYTHON STEPS ---
 
-      # The rest of your build steps (like 'Run tests', 'Build project', etc.)
-      # will go after the 'Install dependencies' step.
-      # You can just keep your existing steps that follow 'Install dependencies'.
+      # Your existing steps like 'Run tests', 'Build project' should be adjusted
+      # based on what testing/building commands are appropriate for your Python project.
+      # For example, if you have a test suite, you'd run 'pytest' or similar.
 
-  # Other jobs (like 'deploy') would go here, if you have them
+      # Example for a simple Python test/lint step:
+      - name: Run Python Linter (e.g., Flake8)
+        run: pip install flake8 && flake8 . # Installs flake8 and runs it on the current directory
+
+      # If you're building a Docker image, your 'Build project' step might look like this:
+      - name: Build Docker image
+        run: docker build -t your-image-name . # Replace 'your-image-name'
+
+      - name: Post Set up Node.js # This step might still be leftover if you didn't remove it. Remove it.
+        if: always() # This 'if' is usually for cleanup steps that run even on failure
+
+      - name: Post Checkout code # This step might still be leftover if you didn't remove it. Remove it.
+        if: always()
+
+      - name: Complete job
+        if: always()
 
