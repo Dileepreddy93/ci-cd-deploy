@@ -1,4 +1,4 @@
-name: CI/CD Pipeline # Keep this if it's at the top of your file
+name: CI/CD Pipeline
 
 on:
   push:
@@ -7,53 +7,81 @@ on:
   pull_request:
     branches:
       - main
+  # You can uncomment the line below if you want to be able to
+  # manually trigger this workflow from the GitHub Actions UI.
+  # workflow_dispatch:
 
 jobs:
-  build: # This is your 'build' job
-    runs-on: ubuntu-latest # The operating system for the job
+  build:
+    runs-on: ubuntu-latest
 
-    steps: # Ensure 'steps' is indented correctly under 'build'
-      - name: Checkout code # This step 'uses' an action
+    steps:
+      - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Set up Python # This step 'uses' an action
+      - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: '3.9' # IMPORTANT: Change to your required Python version (e.g., '3.10', '3.11', '3.x')
+          # IMPORTANT: Change '3.9' to the specific Python version your app requires.
+          # For example: '3.10', '3.11', or '3.x' for the latest available 3.x
+          python-version: '3.9'
 
-      - name: Install Python dependencies # This step 'runs' a command
+      - name: Install Python dependencies
         run: pip install -r requirements.txt
-        # IMPORTANT: If your 'requirements.txt' is NOT in the root of your repo,
+        # If your 'requirements.txt' is NOT in the root of your repository,
         # uncomment the line below and specify the correct subfolder (e.g., 'backend', 'src', 'app'):
         # working-directory: ./your-python-app-folder
 
-      # You mentioned `app.py` and `Dockerfile`. You might want to add steps here for:
-      # 1. Running tests (if you have them, e.g., using pytest)
-      # 2. Building a Docker image
+      # --- Optional: Add steps for testing your Flask app ---
+      # If you have tests (e.g., using pytest), you would add steps here.
+      # - name: Run Python Tests
+      #   run: pip install pytest && pytest
 
-      - name: Run Python Tests (Optional - if you have tests)
-        # This is just an example, replace with your actual test command
-        run: echo "No Python tests configured, skipping."
-        # If you have pytest:
-        # run: pip install pytest && pytest
+      # --- Optional: Build Docker Image ---
+      # Since you have a Dockerfile, you'll likely want to build your Docker image here.
+      # This step requires you to log in to a Docker registry first if it's private.
+      # You'll also need to replace 'your-dockerhub-username/your-image-name'
+      # with your actual Docker Hub username and image name.
 
-      - name: Build Docker image (Optional - if you use Docker)
-        # Assuming Dockerfile is in the root of your repo. Adjust 'path' if needed.
-        run: docker build -t your-repo/your-image-name:$(echo $GITHUB_SHA | cut -c 1-7) .
-        # Replace 'your-repo/your-image-name' with your actual image name
-        # You might also want to add a 'docker login' step before this for private registries
+      # - name: Log in to Docker Hub (or other registry)
+      #   uses: docker/login-action@v3
+      #   with:
+      #     username: ${{ secrets.DOCKER_USERNAME }} # Set this as a GitHub Secret
+      #     password: ${{ secrets.DOCKER_PASSWORD }} # Set this as a GitHub Secret
 
-      # Remove these 'Post' steps if they are still present. They were remnants from Node.js setup
-      # and are often added automatically by GitHub Actions but are not part of your explicit config.
-      # - name: Post Set up Node.js
+      # - name: Build and push Docker image
+      #   uses: docker/build-push-action@v5
+      #   with:
+      #     context: .
+      #     push: true
+      #     tags: your-dockerhub-username/your-image-name:latest # Change this tag
+      #     # You can also use a commit SHA as a tag for unique versions:
+      #     # tags: your-dockerhub-username/your-image-name:${{ github.sha }}
+
+      - name: Final Build Check
+        run: echo "Python dependencies installed and build job completed."
+
+      # Note: Remove these 'Post' steps if they appear in your file.
+      # They are usually automatically added by GitHub Actions internally and not part of your config.
+      # - name: Post Set up Python
       #   if: always()
       # - name: Post Checkout code
       #   if: always()
 
-      - name: Complete job # This is a simple step that 'runs' an echo command
-        run: echo "Build job completed successfully."
-        # Note: 'Complete job' is not a standard GitHub Action.
-        # The job automatically completes when the last step finishes.
-        # You can remove this step if you want to keep the workflow clean.
-// Open file for review
+# --- Optional: Add a 'deploy' job here if you plan to automate deployment ---
+# This is a placeholder structure. Actual deployment steps will vary greatly
+# based on your chosen hosting platform (e.g., Google Cloud Run, AWS Fargate, Render).
 
+#  deploy:
+#    needs: build # This job will only run if the 'build' job succeeds
+#    runs-on: ubuntu-latest
+#    environment: production # Example: link to a GitHub Environments
+#    steps:
+#      - name: Deploy to Cloud Run (Example)
+#        run: |
+#          # Your gcloud deploy commands here, requiring authentication
+#          echo "Deploying to Google Cloud Run..."
+#      - name: Deploy to AWS Fargate (Example)
+#        run: |
+#          # Your AWS CLI commands here, requiring authentication
+#          echo "Deploying to AWS Fargate..."
