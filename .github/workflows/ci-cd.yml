@@ -1,4 +1,4 @@
-name: CI/CD Pipeline
+name: CI/CD Pipeline # Keep this if it's at the top of your file
 
 on:
   push:
@@ -9,46 +9,49 @@ on:
       - main
 
 jobs:
-  build:
-    runs-on: ubuntu-latest
+  build: # This is your 'build' job
+    runs-on: ubuntu-latest # The operating system for the job
 
-    steps:
-      - name: Checkout code
+    steps: # Ensure 'steps' is indented correctly under 'build'
+      - name: Checkout code # This step 'uses' an action
         uses: actions/checkout@v4
 
-      # --- START OF NEW/MODIFIED PYTHON STEPS ---
-
-      - name: Set up Python
+      - name: Set up Python # This step 'uses' an action
         uses: actions/setup-python@v5
         with:
-          python-version: '3.9' # Or '3.x' for the latest available 3.x, or a specific version like '3.10', '3.11' etc.
-                                # Check what Python version your 'app.py' requires.
+          python-version: '3.9' # IMPORTANT: Change to your required Python version (e.g., '3.10', '3.11', '3.x')
 
-      - name: Install Python dependencies
+      - name: Install Python dependencies # This step 'runs' a command
         run: pip install -r requirements.txt
-        # If your requirements.txt is in a subfolder (e.g., './backend'), use:
-        # working-directory: ./backend
+        # IMPORTANT: If your 'requirements.txt' is NOT in the root of your repo,
+        # uncomment the line below and specify the correct subfolder (e.g., 'backend', 'src', 'app'):
+        # working-directory: ./your-python-app-folder
 
-      # --- END OF NEW/MODIFIED PYTHON STEPS ---
+      # You mentioned `app.py` and `Dockerfile`. You might want to add steps here for:
+      # 1. Running tests (if you have them, e.g., using pytest)
+      # 2. Building a Docker image
 
-      # Your existing steps like 'Run tests', 'Build project' should be adjusted
-      # based on what testing/building commands are appropriate for your Python project.
-      # For example, if you have a test suite, you'd run 'pytest' or similar.
+      - name: Run Python Tests (Optional - if you have tests)
+        # This is just an example, replace with your actual test command
+        run: echo "No Python tests configured, skipping."
+        # If you have pytest:
+        # run: pip install pytest && pytest
 
-      # Example for a simple Python test/lint step:
-      - name: Run Python Linter (e.g., Flake8)
-        run: pip install flake8 && flake8 . # Installs flake8 and runs it on the current directory
+      - name: Build Docker image (Optional - if you use Docker)
+        # Assuming Dockerfile is in the root of your repo. Adjust 'path' if needed.
+        run: docker build -t your-repo/your-image-name:$(echo $GITHUB_SHA | cut -c 1-7) .
+        # Replace 'your-repo/your-image-name' with your actual image name
+        # You might also want to add a 'docker login' step before this for private registries
 
-      # If you're building a Docker image, your 'Build project' step might look like this:
-      - name: Build Docker image
-        run: docker build -t your-image-name . # Replace 'your-image-name'
+      # Remove these 'Post' steps if they are still present. They were remnants from Node.js setup
+      # and are often added automatically by GitHub Actions but are not part of your explicit config.
+      # - name: Post Set up Node.js
+      #   if: always()
+      # - name: Post Checkout code
+      #   if: always()
 
-      - name: Post Set up Node.js # This step might still be leftover if you didn't remove it. Remove it.
-        if: always() # This 'if' is usually for cleanup steps that run even on failure
-
-      - name: Post Checkout code # This step might still be leftover if you didn't remove it. Remove it.
-        if: always()
-
-      - name: Complete job
-        if: always()
-
+      - name: Complete job # This is a simple step that 'runs' an echo command
+        run: echo "Build job completed successfully."
+        # Note: 'Complete job' is not a standard GitHub Action.
+        # The job automatically completes when the last step finishes.
+        # You can remove this step if you want to keep the workflow clean.
